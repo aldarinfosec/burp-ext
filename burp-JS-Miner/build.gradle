@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+}
+
+targetCompatibility = '1.8'
+sourceCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'net.portswigger.burp.extender:burp-extender-api:2.3'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.3'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+    implementation 'com.google.re2j:re2j:1.7'
+}
+
+// Define the fatJar task to bundle dependencies into a single JAR
+task fatJar(type: Jar) {
+    archiveBaseName.set(project.name + '-all') // Updated property
+    from {
+        configurations.runtimeClasspath.resolve().collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE // Use the enum type
+}
+
+// Ensure the fatJar task is executed when the build task is executed
+build {
+    dependsOn fatJar
+}
